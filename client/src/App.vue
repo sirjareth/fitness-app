@@ -1,15 +1,12 @@
 <template>
   <div id="app">
-    <Navbar v-if="authStore.isAuthenticated" />
+    <Navbar />
     <router-view />
   </div>
 </template>
 
 <script setup>
-  import Navbar from './components/Navbar.vue'
-  import { useAuthStore } from './stores/auth'
-
-  const authStore = useAuthStore()
+import Navbar from './components/Navbar.vue'
 </script>
 
 <style>

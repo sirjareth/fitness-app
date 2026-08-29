@@ -14,8 +14,7 @@
         <span v-if="workout.reps">🔁 {{ workout.reps }} reps</span>
       </div>
       <div class="card-actions">
-        <button class="btn-complete" @click="$emit('complete', workout._id)"
-          :disabled="workout.status === 'completed'">
+        <button class="btn-complete" @click="$emit('complete', workout._id)" :disabled="workout.status === 'completed'">
           Mark Done
         </button>
         <button class="btn-edit" @click="$emit('edit', workout)">Edit</button>
@@ -27,6 +26,9 @@
 
 <script setup>
 import { computed } from 'vue'
+import { getWorkoutImage } from '../data/workoutImages.js'
+
+const workoutImage = computed(() => getWorkoutImage(props.workout.name))
 
 const props = defineProps({ workout: Object })
 defineEmits(['complete', 'edit', 'delete'])
@@ -50,13 +52,7 @@ const workoutImages = {
 
 const defaultImage = 'https://images.unsplash.com/photo-1517836357463-d25dfeac3438?w=400&q=80'
 
-const workoutImage = computed(() => {
-  const name = props.workout.name?.toLowerCase() || ''
-  for (const key in workoutImages) {
-    if (name.includes(key)) return workoutImages[key]
-  }
-  return defaultImage
-})
+
 </script>
 
 <style scoped>
@@ -67,8 +63,14 @@ const workoutImage = computed(() => {
   overflow: hidden;
   transition: border 0.2s;
 }
-.card:hover { border-color: #4ade80; }
-.card.completed { opacity: 0.6; }
+
+.card:hover {
+  border-color: #4ade80;
+}
+
+.card.completed {
+  opacity: 0.6;
+}
 
 .card-image {
   position: relative;
@@ -76,12 +78,14 @@ const workoutImage = computed(() => {
   height: 160px;
   overflow: hidden;
 }
+
 .card-image img {
   width: 100%;
   height: 100%;
   object-fit: cover;
   transition: transform 0.3s;
 }
+
 .card:hover .card-image img {
   transform: scale(1.05);
 }
@@ -96,36 +100,89 @@ const workoutImage = computed(() => {
   font-weight: 600;
   backdrop-filter: blur(4px);
 }
-.status-badge.completed { background: rgba(20,83,45,0.85); color: #4ade80; }
-.status-badge.pending, .status-badge:not(.completed) { background: rgba(67,20,7,0.85); color: #fb923c; }
+
+.status-badge.completed {
+  background: rgba(20, 83, 45, 0.85);
+  color: #4ade80;
+}
+
+.status-badge.pending,
+.status-badge:not(.completed) {
+  background: rgba(67, 20, 7, 0.85);
+  color: #fb923c;
+}
 
 .card-body {
   padding: 16px 20px;
 }
-h3 { font-size: 1.1rem; color: #fff; margin-bottom: 8px; }
+
+h3 {
+  font-size: 1.1rem;
+  color: #fff;
+  margin-bottom: 8px;
+}
 
 .card-info {
-  display: flex; gap: 14px; color: #aaa;
-  font-size: 0.88rem; margin-bottom: 14px;
+  display: flex;
+  gap: 14px;
+  color: #aaa;
+  font-size: 0.88rem;
+  margin-bottom: 14px;
 }
-.card-actions { display: flex; gap: 8px; }
+
+.card-actions {
+  display: flex;
+  gap: 8px;
+}
 
 .btn-complete {
-  padding: 7px 14px; background: #14532d; color: #4ade80;
-  border: none; border-radius: 7px; cursor: pointer; font-size: 0.85rem; transition: background 0.2s;
+  padding: 7px 14px;
+  background: #14532d;
+  color: #4ade80;
+  border: none;
+  border-radius: 7px;
+  cursor: pointer;
+  font-size: 0.85rem;
+  transition: background 0.2s;
 }
-.btn-complete:hover:not(:disabled) { background: #166534; }
-.btn-complete:disabled { opacity: 0.4; cursor: not-allowed; }
+
+.btn-complete:hover:not(:disabled) {
+  background: #166534;
+}
+
+.btn-complete:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
 
 .btn-edit {
-  padding: 7px 14px; background: #1e3a5f; color: #60a5fa;
-  border: none; border-radius: 7px; cursor: pointer; font-size: 0.85rem; transition: background 0.2s;
+  padding: 7px 14px;
+  background: #1e3a5f;
+  color: #60a5fa;
+  border: none;
+  border-radius: 7px;
+  cursor: pointer;
+  font-size: 0.85rem;
+  transition: background 0.2s;
 }
-.btn-edit:hover { background: #1d4ed8; color: #fff; }
+
+.btn-edit:hover {
+  background: #1d4ed8;
+  color: #fff;
+}
 
 .btn-delete {
-  padding: 7px 14px; background: #3f1515; color: #f87171;
-  border: none; border-radius: 7px; cursor: pointer; font-size: 0.85rem; transition: background 0.2s;
+  padding: 7px 14px;
+  background: #3f1515;
+  color: #f87171;
+  border: none;
+  border-radius: 7px;
+  cursor: pointer;
+  font-size: 0.85rem;
+  transition: background 0.2s;
 }
-.btn-delete:hover { background: #7f1d1d; }
+
+.btn-delete:hover {
+  background: #7f1d1d;
+}
 </style>
