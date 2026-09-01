@@ -1,247 +1,171 @@
 <template>
   <div class="home">
+    <!-- Header -->
+    <div class="page-header">
+      <div>
+        <h2>Browse Workouts</h2>
+        <p class="subtext">{{ sampleWorkouts.length }} workouts available</p>
+      </div>
+    </div>
 
-    <!-- Hero Section -->
-    <section class="hero">
-      <div class="hero-content">
-        <h1>Track Your <span class="highlight">Fitness Journey</span></h1>
-        <p>Log workouts, monitor progress, and crush your goals — all in one place.</p>
-        <div class="hero-actions">
-          <router-link to="/register" class="btn-primary">Get Started Free</router-link>
-          <router-link to="/login" class="btn-secondary">Login</router-link>
+    <!-- Search + Filter -->
+    <div class="filters">
+      <div class="search-box">
+        <span class="search-icon">🔍</span>
+        <input v-model="search" placeholder="e.g. Push Ups, Swimming..." />
+      </div>
+      <div class="category-filters">
+        <button v-for="cat in categories" :key="cat" :class="['cat-btn', { active: selectedCategory === cat }]"
+          @click="selectedCategory = cat">
+          {{ cat }}
+        </button>
+      </div>
+    </div>
+
+    <!-- Workout Grid -->
+    <div class="workout-grid">
+      <div class="workout-card" v-for="workout in filteredWorkouts" :key="workout.name">
+        <div class="workout-img">
+          <img :src="workout.image" :alt="workout.name" />
+          <span class="workout-tag">{{ workout.category }}</span>
+        </div>
+        <div class="workout-info">
+          <h3>{{ workout.name }}</h3>
+          <p>⏱ {{ workout.duration }} mins</p>
+          <button class="btn-try" @click="goToLogin">+ Add to My Workouts</button>
         </div>
       </div>
-      <div class="hero-image">
-        <img src="https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=600&q=80" alt="Fitness" />
-      </div>
-    </section>
-
-    <!-- Features Section -->
-    <section class="features">
-      <h2>Everything you need to stay fit</h2>
-      <div class="features-grid">
-        <div class="feature-card">
-          <span class="feature-icon">📋</span>
-          <h3>Log Workouts</h3>
-          <p>Track every exercise, duration, sets and reps easily.</p>
-        </div>
-        <div class="feature-card">
-          <span class="feature-icon">✅</span>
-          <h3>Track Progress</h3>
-          <p>Mark workouts as done and monitor your consistency.</p>
-        </div>
-        <div class="feature-card">
-          <span class="feature-icon">✏️</span>
-          <h3>Edit Anytime</h3>
-          <p>Update or delete workouts as your routine changes.</p>
-        </div>
-        <div class="feature-card">
-          <span class="feature-icon">🔒</span>
-          <h3>Secure & Personal</h3>
-          <p>Your workouts are private — only you can see them.</p>
-        </div>
-      </div>
-    </section>
-
-    <!-- Sample Workouts Section -->
-    <section class="sample-workouts">
-      <h2>Sample Workouts</h2>
-      <p class="section-sub">Here's what you can track with FitTrack</p>
-      <div class="workout-grid">
-        <div class="workout-card" v-for="workout in sampleWorkouts" :key="workout.name">
-          <div class="workout-img">
-            <img :src="workout.image" :alt="workout.name" />
-            <span class="workout-tag">{{ workout.category }}</span>
-          </div>
-          <div class="workout-info">
-            <h3>{{ workout.name }}</h3>
-            <p>⏱ {{ workout.duration }} mins</p>
-            <button class="btn-try" @click="goToLogin">+ Add to My Workouts</button>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- CTA Section -->
-    <section class="cta">
-      <h2>Ready to start your fitness journey?</h2>
-      <p>Join FitTrack today and take control of your workouts.</p>
-      <router-link to="/register" class="btn-primary">Create Free Account</router-link>
-    </section>
-
+    </div>
   </div>
 </template>
 
 <script setup>
-import { sampleWorkouts } from '../data/sampleWorkouts.js'
+import { ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
+import { sampleWorkouts } from '../data/sampleWorkouts.js'
 
 const router = useRouter()
+const search = ref('')
+const selectedCategory = ref('All')
 
 function goToLogin() {
   router.push('/login')
 }
 
+const categories = computed(() => {
+  const cats = [...new Set(sampleWorkouts.map(w => w.category))]
+  return ['All', ...cats]
+})
+
+const aliases = {
+  'running': 'run',
+  'jogging': 'jog',
+  'swimming': 'swim',
+  'pressing': 'press',
+  'pulling': 'pull',
+  'pushing': 'push',
+}
+
+const filteredWorkouts = computed(() => {
+  const raw = search.value.toLowerCase()
+  const term = aliases[raw] || raw
+
+  return sampleWorkouts.filter(w => {
+    const matchSearch = !term || w.name.toLowerCase().includes(term)
+    const matchCat = selectedCategory.value === 'All' || w.category === selectedCategory.value
+    return matchSearch && matchCat
+  })
+})
 </script>
 
 <style scoped>
 .home {
-  padding-bottom: 80px;
-}
-
-/* Hero */
-.hero {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 40px;
-  padding: 80px 80px;
   max-width: 1200px;
   margin: 0 auto;
+  padding: 36px 32px;
 }
 
-.hero-content {
-  flex: 1;
+.page-header {
+  margin-bottom: 28px;
 }
 
-.hero-content h1 {
-  font-size: 3rem;
+h2 {
+  font-size: 2rem;
   font-weight: 800;
-  line-height: 1.2;
-  margin-bottom: 20px;
-}
-
-.highlight {
-  color: #4ade80;
-}
-
-.hero-content p {
-  font-size: 1.1rem;
-  color: #aaa;
-  margin-bottom: 32px;
-  max-width: 480px;
-}
-
-.hero-actions {
-  display: flex;
-  gap: 14px;
-}
-
-.hero-image {
-  flex: 1;
-  border-radius: 20px;
-  overflow: hidden;
-  max-width: 500px;
-}
-
-.hero-image img {
-  width: 100%;
-  height: 380px;
-  object-fit: cover;
-}
-
-/* Buttons */
-.btn-primary {
-  padding: 13px 28px;
-  background: #4ade80;
-  color: #000;
-  font-weight: 700;
-  border-radius: 10px;
-  text-decoration: none;
-  font-size: 1rem;
-  transition: background 0.2s;
-  display: inline-block;
-}
-
-.btn-primary:hover {
-  background: #22c55e;
-}
-
-.btn-secondary {
-  padding: 13px 28px;
-  background: transparent;
   color: #fff;
-  font-weight: 600;
-  border-radius: 10px;
-  text-decoration: none;
-  font-size: 1rem;
-  border: 1px solid #444;
-  transition: all 0.2s;
-  display: inline-block;
 }
 
-.btn-secondary:hover {
-  border-color: #4ade80;
-  color: #4ade80;
-}
-
-/* Features */
-.features {
-  padding: 80px;
-  max-width: 1200px;
-  margin: 0 auto;
-  text-align: center;
-}
-
-.features h2 {
-  font-size: 2rem;
-  margin-bottom: 48px;
-}
-
-.features-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-  gap: 20px;
-}
-
-.feature-card {
-  background: #1a1a1a;
-  border: 1px solid #2e2e2e;
-  border-radius: 14px;
-  padding: 28px 24px;
-  transition: border 0.2s;
-}
-
-.feature-card:hover {
-  border-color: #4ade80;
-}
-
-.feature-icon {
-  font-size: 2rem;
-  display: block;
-  margin-bottom: 14px;
-}
-
-.feature-card h3 {
-  font-size: 1.1rem;
-  margin-bottom: 8px;
-}
-
-.feature-card p {
+.subtext {
   color: #888;
   font-size: 0.9rem;
+  margin-top: 4px;
 }
 
-/* Sample Workouts */
-.sample-workouts {
-  padding: 80px;
-  max-width: 1200px;
-  margin: 0 auto;
+/* Filters */
+.filters {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  margin-bottom: 32px;
 }
 
-.sample-workouts h2 {
-  font-size: 2rem;
-  margin-bottom: 8px;
+.search-box {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: #1a1a1a;
+  border: 1px solid #2e2e2e;
+  border-radius: 10px;
+  padding: 12px 16px;
+  max-width: 400px;
 }
 
-.section-sub {
-  color: #888;
-  margin-bottom: 40px;
+.search-box input {
+  background: transparent;
+  border: none;
+  outline: none;
+  color: #fff;
+  font-size: 0.95rem;
+  width: 100%;
 }
 
+.search-icon {
+  font-size: 1rem;
+}
+
+.category-filters {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.cat-btn {
+  padding: 6px 16px;
+  background: #1a1a1a;
+  border: 1px solid #2e2e2e;
+  border-radius: 20px;
+  color: #aaa;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.cat-btn:hover {
+  border-color: #4ade80;
+  color: #4ade80;
+}
+
+.cat-btn.active {
+  background: #4ade80;
+  color: #000;
+  border-color: #4ade80;
+  font-weight: 700;
+}
+
+/* Grid */
 .workout-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
   gap: 20px;
 }
 
@@ -294,6 +218,7 @@ function goToLogin() {
 .workout-info h3 {
   font-size: 1.05rem;
   margin-bottom: 6px;
+  color: #fff;
 }
 
 .workout-info p {
@@ -318,23 +243,5 @@ function goToLogin() {
   background: #4ade80;
   color: #000;
   font-weight: 700;
-}
-
-/* CTA */
-.cta {
-  text-align: center;
-  padding: 80px;
-  background: #111;
-  margin-top: 40px;
-}
-
-.cta h2 {
-  font-size: 2rem;
-  margin-bottom: 12px;
-}
-
-.cta p {
-  color: #888;
-  margin-bottom: 32px;
 }
 </style>

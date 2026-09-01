@@ -1,15 +1,17 @@
 <template>
   <nav class="navbar">
-    <router-link to="/" class="brand">💪 FitTrack</router-link>
-    <div class="nav-actions">
-      <template v-if="authStore.isAuthenticated">
-        <router-link to="/dashboard" class="nav-link">My Workouts</router-link>
-        <button class="logout-btn" @click="handleLogout">Logout</button>
-      </template>
-      <template v-else>
-        <router-link to="/login" class="nav-link">Login</router-link>
-        <router-link to="/register" class="nav-btn">Get Started</router-link>
-      </template>
+    <div class="nav-inner">
+      <router-link to="/" class="brand">💪 FitTrack</router-link>
+      <div class="nav-actions">
+        <template v-if="authStore.isAuthenticated">
+          <router-link to="/dashboard" class="nav-link">My Workouts</router-link>
+          <button class="logout-btn" @click="handleLogout">Logout</button>
+        </template>
+        <template v-else>
+          <router-link to="/login" class="nav-link">Login</router-link>
+          <router-link to="/register" class="nav-btn">Get Started</router-link>
+        </template>
+      </div>
     </div>
   </nav>
 </template>
@@ -29,12 +31,21 @@ function handleLogout() {
 
 <style scoped>
 .navbar {
+  position: sticky;
+  top: 0;
+  z-index: 99;
+  background: #1a1a1a;
+  border-bottom: 1px solid #2e2e2e;
+  width: 100%;
+}
+
+.nav-inner {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 16px 32px;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 16px 32px;
-  background: #1a1a1a;
-  border-bottom: 1px solid #2e2e2e;
 }
 
 .brand {
