@@ -9,10 +9,8 @@
           <button class="close-btn" @click="$emit('cancel')">✕</button>
         </div>
 
-        <!-- Search -->
         <input v-model="search" class="search-input" placeholder="🔍 Search workout..." />
 
-        <!-- Category Filter -->
         <div class="category-filters">
           <button v-for="cat in categories" :key="cat" :class="['cat-btn', { active: selectedCategory === cat }]"
             @click="selectedCategory = cat">
@@ -20,7 +18,6 @@
           </button>
         </div>
 
-        <!-- Workout Grid -->
         <div class="picker-grid">
           <div v-for="workout in filteredWorkouts" :key="workout.name" class="picker-card"
             @click="selectWorkout(workout)">
@@ -32,7 +29,6 @@
           </div>
         </div>
 
-        <!-- Custom workout option -->
         <button class="custom-btn" @click="selectCustom">
           ✏️ Create custom workout instead
         </button>
@@ -47,7 +43,6 @@
         </div>
 
         <div class="details-layout">
-          <!-- Left: Image preview -->
           <div class="preview-image" v-if="selectedImage">
             <img :src="selectedImage" :alt="form.name" />
             <div class="preview-overlay">
@@ -56,9 +51,7 @@
             </div>
           </div>
 
-          <!-- Right: Form fields -->
           <div class="details-form">
-            <!-- Name (editable if custom) -->
             <div class="form-group" v-if="isCustom">
               <label>Workout Name *</label>
               <input v-model="form.name" placeholder="e.g. My Workout" required />
@@ -98,12 +91,6 @@ import { useWorkoutStore } from '../stores/workouts'
 import { sampleWorkouts } from '../data/sampleWorkouts.js'
 import { getWorkoutImage } from '../data/workoutImages.js'
 
-// Add this computed
-const selectedImage = computed(() => {
-  if (isCustom.value) return getWorkoutImage(form.value.name)
-  return pickedImage.value
-})
-
 const props = defineProps({
   workout: { type: Object, default: null }
 })
@@ -115,11 +102,16 @@ const error = ref('')
 const step = ref(1)
 const search = ref('')
 const selectedCategory = ref('All')
-
+const pickedImage = ref('')
 const isCustom = ref(false)
 const isEditing = ref(false)
 
 const form = ref({ name: '', duration: '', sets: '', reps: '', category: '' })
+
+const selectedImage = computed(() => {
+  if (isCustom.value) return getWorkoutImage(form.value.name)
+  return pickedImage.value
+})
 
 const categories = computed(() => {
   const cats = [...new Set(sampleWorkouts.map(w => w.category))]
@@ -134,27 +126,19 @@ const filteredWorkouts = computed(() => {
   })
 })
 
-// If editing, skip to step 2
 watch(() => props.workout, (val) => {
   if (val) {
     isEditing.value = true
     form.value = { ...val }
-    selectedImage.value = getImageForWorkout(val.name)
+    pickedImage.value = getWorkoutImage(val.name)
     step.value = 2
   }
 }, { immediate: true })
 
-function getImageForWorkout(name) {
-  const found = sampleWorkouts.find(w =>
-    name?.toLowerCase().includes(w.name.toLowerCase())
-  )
-  return found?.image || 'https://images.unsplash.com/photo-1517836357463-d25dfeac3438?w=400&q=80'
-}
-
 function selectWorkout(workout) {
   form.value.name = workout.name
   form.value.category = workout.category
-  form.value.duration = workout.duration  // ← pre-fill duration
+  form.value.duration = workout.duration
   pickedImage.value = workout.image
   isCustom.value = false
   step.value = 2
@@ -354,7 +338,6 @@ async function handleSubmit() {
   color: #4ade80;
 }
 
-/* Step 2 */
 .details-layout {
   display: flex;
   gap: 24px;
